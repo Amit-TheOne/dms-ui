@@ -2,6 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Upload from "./pages/Upload";
+import Search from "./pages/Search";
 
 export default function App() {
 
@@ -14,6 +15,7 @@ export default function App() {
           <nav className="flex gap-4 text-sm">
             <Link to="/login" className="hover:font-bold">Login</Link>
             <Link to="/upload" className="hover:font-bold">Upload</Link>
+            <Link to="/search" className="hover:underline">Search</Link>
           </nav>
         </div>
       </header>
@@ -23,6 +25,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/upload" element={<Upload />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </main>
 
