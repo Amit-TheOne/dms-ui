@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { searchDocuments } from "../redux/features/searchSlice";
 import TagInput from "../components/TagInput";
+import PreviewModal from "../components/PreviewModal";
+import { downloadFile, downloadAllAsZip } from "../utils/downloadFile";
 
 export default function Search() {
   const dispatch = useAppDispatch();
-  const { results, loading, error } = useAppSelector((s) => s.search);
+  const { results, loading, error } = useAppSelector((state) => state.search);
 
   const [major, setMajor] = useState("");
   const [minor, setMinor] = useState("");
@@ -13,6 +15,10 @@ export default function Search() {
   const [toDate, setToDate] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [keyword, setKeyword] = useState("");
+
+   // preview modal state
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +32,11 @@ export default function Search() {
         searchKeyword: keyword,
       })
     );
+  };
+
+  const handlePreview = (url: string) => {
+    setPreviewFileUrl(url);
+    setPreviewOpen(true);
   };
 
   return (
@@ -106,44 +117,78 @@ export default function Search() {
 
       {error && <p className="text-red-600">{error}</p>}
 
-      {/* Results */}
+       {/* Results */}
       {results && results.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-3 py-2 border">Date</th>
-                <th className="px-3 py-2 border">Major</th>
-                <th className="px-3 py-2 border">Minor</th>
-                <th className="px-3 py-2 border">Tags</th>
-                <th className="px-3 py-2 border">Remarks</th>
-                <th className="px-3 py-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map((doc: any) => (
-                <tr key={doc.id || doc._id}>
-                  <td className="px-3 py-2 border">{doc.document_date}</td>
-                  <td className="px-3 py-2 border">{doc.major_head}</td>
-                  <td className="px-3 py-2 border">{doc.minor_head}</td>
-                  <td className="px-3 py-2 border">
-                    {doc.tags?.map((t: any) => t.tag_name).join(", ")}
-                  </td>
-                  <td className="px-3 py-2 border">{doc.document_remarks}</td>
-                  <td className="px-3 py-2 border">
-                    <button className="text-indigo-600 hover:underline mr-2">
-                      Preview
-                    </button>
-                    <button className="text-green-600 hover:underline">
-                      Download
-                    </button>
-                  </td>
+        <>
+          <div className="mb-3">
+            <button
+              onClick={() =>
+                downloadAllAsZip(
+                  results.map((doc: any) => ({
+                    url: doc.file_url
+                  }))
+                )
+              }
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Download All as ZIP
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-3 py-2 border">Date</th>
+                  <th className="px-3 py-2 border">Major</th>
+                  <th className="px-3 py-2 border">Minor</th>
+                  <th className="px-3 py-2 border">Tags</th>
+                  <th className="px-3 py-2 border">Remarks</th>
+                  <th className="px-3 py-2 border">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {results.map((doc: any) => (
+                  <tr key={doc.id || doc._id}>
+                    <td className="px-3 py-2 border">{doc.document_date}</td>
+                    <td className="px-3 py-2 border">{doc.major_head}</td>
+                    <td className="px-3 py-2 border">{doc.minor_head}</td>
+                    <td className="px-3 py-2 border">
+                      {doc.tags?.map((t: any) => t.tag_name).join(", ")}
+                    </td>
+                    <td className="px-3 py-2 border">{doc.document_remarks}</td>
+                    <td className="px-3 py-2 border">
+                      <button
+                        className="text-indigo-600 hover:underline mr-2"
+                        onClick={() =>
+                          handlePreview(doc.file_url)
+                        }
+                      >
+                        Preview
+                      </button>
+                      <button
+                        className="text-green-600 hover:underline"
+                        onClick={() =>
+                          downloadFile(doc.file_url)
+                        }
+                      >
+                        Download
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
+
+      {/* Preview modal */}
+      <PreviewModal
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        fileUrl={previewFileUrl}
+      />
     </div>
   );
 }
