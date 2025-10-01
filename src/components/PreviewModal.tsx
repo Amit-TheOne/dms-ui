@@ -21,32 +21,39 @@ export default function PreviewModal({
   const isImage = /\.(jpg|jpeg|png|gif|bmp|webp|svg)($|\?)/i.test(fileUrl);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-11/12 max-w-3xl rounded shadow-lg p-4 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-200 via-blue-100 to-indigo-400/80 backdrop-blur-sm">
+      <div className="relative w-11/12 max-w-3xl bg-white/95 rounded-xl shadow-2xl p-0  bg-clip-padding">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-900 shadow transition text-2xl font-bold focus:outline-none z-50 cursor-pointer"
+          aria-label="Close preview"
+          style={{ background: "rgba(255,255,255,0.7)", pointerEvents: "auto" }}
         >
-          ✕
+          ×
         </button>
 
-        <h2 className="text-lg font-semibold mb-3">Preview</h2>
+        <h2 className="text-2xl font-extrabold text-indigo-800 text-center mb-4 mt-4 drop-shadow">Preview</h2>
 
-        {isPdf ? (
-          <div className="h-[70vh] overflow-y-auto border">
-            <Document file={fileUrl}>
-              <Page pageNumber={1} width={700} />
-            </Document>
-          </div>
-        ) : isImage ? (
-          <img
-            src={fileUrl}
-            alt="Preview"
-            className="max-h-[70vh] mx-auto object-contain"
-          />
-        ) : (
-          <div className="text-center text-gray-500">Cannot preview this file type.</div>
-        )}
+        <div className="flex justify-center items-center h-[80vh]">
+          {isPdf ? (
+            <div className="h-full w-full flex justify-center items-center bg-indigo-50 rounded-xl border-2 border-indigo-100 shadow-inner overflow-y-auto">
+              <Document file={fileUrl} className="h-full w-full flex justify-center items-center">
+                <Page pageNumber={1} width={700} height={600} className="h-full w-full" />
+              </Document>
+            </div>
+          ) : isImage ? (
+            <div className="h-full w-full flex justify-center items-center bg-indigo-50 rounded-xl border-2 border-indigo-100 shadow-inner">
+              <img
+                src={fileUrl}
+                alt="Preview"
+                className="object-contain rounded-lg shadow max-w-full max-h-full"
+                style={{ maxHeight: '65vh', maxWidth: '100%' }}
+              />
+            </div>
+          ) : (
+            <div className="text-center text-indigo-700 font-semibold w-full">Cannot preview this file type.</div>
+          )}
+        </div>
       </div>
     </div>
   );
