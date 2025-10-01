@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/authSlice";
+import uploadReducer from "./features/uploadSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    upload: uploadReducer,
   },
 });
 
