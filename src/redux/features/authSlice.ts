@@ -16,7 +16,7 @@ export const validateOtp = createAsyncThunk(
   async ({ mobile_number, otp }: { mobile_number: string; otp: string }) => {
     const res = await api.post("/validateOTP", { mobile_number, otp });
     const token = res.data.token || res.data?.data?.token;
-    if (!token) throw new Error("Token not found in response");
+    if (!token) throw new Error("OTP validation failed");
     localStorage.setItem("dms_token", token);
     api.defaults.headers.common["token"] = token;
     return token;
